@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Daniele\Documents\PlatformIO\Projects\SmartMeter\build\CMakeFiles\a6b5f51c1c213e2c3d2f5e93a37538f1\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{AF6640A1-D2B9-390E-947D-452CD1BE1D03}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,4 @@
+C:/Users/Daniele/Documents/PlatformIO/Projects/SmartMeter/build/CMakeFiles/unity.dir
+C:/Users/Daniele/Documents/PlatformIO/Projects/SmartMeter/build/CMakeFiles/INSTALL.dir
+C:/Users/Daniele/Documents/PlatformIO/Projects/SmartMeter/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Daniele/Documents/PlatformIO/Projects/SmartMeter/build/CMakeFiles/ZERO_CHECK.dir
