@@ -230,6 +230,9 @@ void sendInstantPower(Contract energyContract, int instantPower) {
     Serial.printf("s: %s\n", strS.c_str());
 
     Serial.println("Until setup");
+    // Il crash avviente in questa esecuzione di funzione presente nel file Contract.cpp
+    // di Web3E alla posizione .pio/libdeps/esp32dev/Web3E/src/Contract.cpp
+    // Presenta differentemente alla funzione in echoBytes, l'invio anche di due valori interi
     string dataStr = energyContract.SetupContractData(
         "addPowerEntry(uint256, bytes, bytes, bytes, uint)",
         (uint256_t)instantPower, 
