@@ -194,7 +194,9 @@ string Web3::EthSendSignedTransaction(const string* data, const uint32_t dataLen
 // Private
 
 string Web3::generateJson(const string* method, const string* params) {
-    return "{\"jsonrpc\":\"2.0\",\"method\":\"" + *method + "\",\"params\":" + *params + ",\"id\":0}";
+    string s = "{\"jsonrpc\":\"2.0\",\"method\":\"" + *method + "\",\"params\":" + *params + ",\"id\":0}";
+    // Serial.printf("%s\n", s.c_str());
+    return s;
 }
 
 string Web3::exec(const string* data) {

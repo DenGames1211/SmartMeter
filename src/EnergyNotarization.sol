@@ -14,10 +14,6 @@ contract EnergyNotarization {
     mapping(address => HomeEnergy) notarizations;
     mapping(address => bytes32) private authorized;
 
-    function echoBytes(bytes32 hash, bytes32 r, bytes32 s) pure public returns(string memory){
-        return "Funzione Avviata";
-    }
-
     function recoverSigner(bytes32 hash, bytes32 r, bytes32 s, uint8 v) public pure returns (address) {
         // Si ammettono solo le versioni corrette: 27 o 28 / 0 o 1
         if (v < 27) {

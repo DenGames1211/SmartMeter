@@ -41,6 +41,7 @@ string Contract::SetupContractData(const char* func, ...)
     string ret = "";
 
     string contractBytes = GenerateContractBytes(func);
+    // Serial.printf("%s\n", contractBytes.c_str());
     ret = contractBytes;
 
     size_t paramCount = 0;
@@ -73,7 +74,7 @@ string Contract::SetupContractData(const char* func, ...)
     va_list args;
     va_start(args, func);
     for( int i = 0; i < paramCount; ++i ) {
-        if (strstr(params[i].c_str(), "uint") != NULL && strstr(params[i].c_str(), "[]") != NULL)
+        if (strstr(params[i].c_str(), "uint") != NULL && strstr(params[i].c_str(), "[]") != NULL && false)
         {
             // value array
             string output = GenerateBytesForUIntArray(va_arg(args, vector<uint32_t> *));
@@ -84,6 +85,7 @@ string Contract::SetupContractData(const char* func, ...)
         else if (strncmp(params[i].c_str(), "uint", sizeof("uint")) == 0 || strncmp(params[i].c_str(), "uint256", sizeof("uint256")) == 0)
         {
             string output = GenerateBytesForUint(va_arg(args, uint256_t *));
+            // Serial.printf("%s\n", output.c_str());
             abiBlocks.push_back(output);
             isDynamic.push_back(false);
             dynamicStartPointer += 0x20;
@@ -109,10 +111,11 @@ string Contract::SetupContractData(const char* func, ...)
             isDynamic.push_back(true);
             dynamicStartPointer += 0x20;
         }
-        else if (strncmp(params[i].c_str(), "bytes", sizeof("bytes")) == 0) //if sending bytes, take the value in hex
+        else if (strncmp(params[i].c_str(), "bytes", sizeof("bytes")) == 0 || strncmp(params[i].c_str(), "bytes32", sizeof("bytes32")) == 0) //if sending bytes, take the value in hex
         {
             string output = GenerateBytesForHexBytes(va_arg(args, string *));
-            // abiBlocks.push_back(*va_arg(args, string *));
+            output = output.substr(output.length() - 64);
+            // Serial.printf("%s\n", output.c_str());
             abiBlocks.push_back(output);
             isDynamic.push_back(true);
             dynamicStartPointer += 0x20;
@@ -127,15 +130,16 @@ string Contract::SetupContractData(const char* func, ...)
     }
     va_end(args);
 
-    uint256_t abiOffet = uint256_t(dynamicStartPointer);
+    // uint256_t abiOffet = uint256_t(dynamicStartPointer);
     //now build output - parse 1, standard params
     for( int i = 0; i < paramCount; ++i ) 
     {
         if (isDynamic[i])
         {
-            ret = ret + abiOffet.str(16, 64);
+            //ret = ret + abiOffet.str(16, 64);
             string *outputHex = &abiBlocks[i];
-            abiOffet += outputHex->size() / 2;
+            // Serial.printf("\nAbiBlocks %d: %s\n", i, outputHex->c_str());
+            // abiOffet += outputHex->size() / 2;
         }
         else
         {

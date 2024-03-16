@@ -81,14 +81,14 @@ string Contract::SetupContractData(const char* func, ...)
             isDynamic.push_back(false);
             dynamicStartPointer += 0x20;
         }
-        else if (strncmp(params[i].c_str(), "uint", sizeof("uint")) == 0 || strncmp(params[i].c_str(), "uint256", sizeof("uint256")) == 0)
+        else if (strncmp(params[i].c_str(), "uint", sizeof("uint")) == 0 || strncmp(params[i].c_str(), "uint8", sizeof("uint8")) == 0)
         {
             string output = GenerateBytesForUint(va_arg(args, uint256_t *));
             abiBlocks.push_back(output);
             isDynamic.push_back(false);
             dynamicStartPointer += 0x20;
         }
-        else if (strncmp(params[i].c_str(), "int", sizeof("int")) == 0 || strncmp(params[i].c_str(), "bool", sizeof("bool")) == 0)
+        else if (strncmp(params[i].c_str(), "int", sizeof("int")) == 0 || strncmp(params[i].c_str(), "bool", sizeof("bool")) == 0 || strncmp(params[i].c_str(), "uint256", sizeof("uint256")) == 0 )
         {
             string output = GenerateBytesForInt(va_arg(args, int32_t));
             abiBlocks.push_back(output);
@@ -109,7 +109,7 @@ string Contract::SetupContractData(const char* func, ...)
             isDynamic.push_back(true);
             dynamicStartPointer += 0x20;
         }
-        else if (strncmp(params[i].c_str(), "bytes", sizeof("bytes")) == 0) //if sending bytes, take the value in hex
+        else if (strncmp(params[i].c_str(), "bytes", sizeof("bytes")) == 0 || strncmp(params[i].c_str(), "bytes32", sizeof("bytes32")) == 0) //if sending bytes, take the value in hex
         {
             string output = GenerateBytesForHexBytes(va_arg(args, string *));
             abiBlocks.push_back(output);

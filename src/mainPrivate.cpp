@@ -30,22 +30,45 @@ std::vector<WiFiCredentials> wiFiCredentials{
 // Blockchain Pubbliche: meglio sidechain come Polygon (permette di risparmiare sul costo delle transazioni)
 
 // Address of SC to connect to
-const char *CONTRACT_ADDRESS = "0xc7F472ae1c408c30d5E13286C3Db6dDc3f00Ce84";
+const char *CONTRACT_ADDRESS = "0xD7943094Fc2469Dd16d28aba39204257C3d293E3";
 // Address of Personal Wallet
 const char *MY_ADDRESS = "0x627306090abaB3A6e1400e9345bC60c78a8BEf57";
 
-// Web3 Object to manage the connection
-Web3 *web3;
 Crypto *crypto;
 
 // Stores the last time the code was executed
 unsigned long previousMillis = 0;
-// Time between SC interactions in milliseconds (10 seconds rn)
-const long interval = 10000;
+/*
+Impostando 1, 10, 100 tx al secondo, per un totale di 100, 1000 e 10000 tx rispettivamente
+*/
+// Time between SC interactions in milliseconds (0,1 seconds rn)
+const long interval = 100;
+const long unsigned int txLimit = 1000;
+
+unsigned long currentMillis;
+unsigned long startTime;
+unsigned long endTime;
+unsigned long totalStartTime;
+unsigned long totalEndTime;
+unsigned long int txCounter = 0;
+
+int randomNumber = 0;
 
 uint8_t secureESPID[8] = {'e', 's', 'i', '3', 'p', 'm', 't', '@'};
+// hashedESPID sembra cambiare dopo esecuzioni varie, da verificare
 uint8_t hashedESPID[32];
 uint8_t signatureESPID[65];
+
+
+// Define Socket of BC Service
+// The ip address should be that of the server running SSL
+const char * ip_add = "192.168.126.243";
+unsigned short port = 443;
+long long networkId = 1337;
+Web3 *web3 = new Web3(networkId, ip_add, port);
+
+// Connect to Running SC
+Contract energyContract = Contract(web3, CONTRACT_ADDRESS);
 
 string uint8ArrayToHexString(uint8_t arr[], size_t len) {
   string hexStr = "";
@@ -166,91 +189,9 @@ void getMaxPower(Contract energyContract) {
     Serial.printf("Energy Notarization - Get AllTimeMax POW - Result: %d\n", web3->getInt(&result));
 }
 
-void authenticate(Contract energyContract) {
-    string waddress = (string) MY_ADDRESS;
-    string caddress = (string) CONTRACT_ADDRESS;
-
-    // Extracting r, s, and v
-    BYTE r[32], s[32];
-    BYTE v;
-
-    memcpy(r, signatureESPID, 32); // Copy first 32 bytes to r
-    memcpy(s, signatureESPID + 32, 32); // Copy next 32 bytes to s
-    v = signatureESPID[64];
-
-    // Define Nonce, int value associated to transaction
-    uint32_t nonceVal = (uint32_t)web3->EthGetTransactionCount(&waddress);
-    // Define gasPrice, int of gas used for transaction
-    unsigned long long gasPriceVal = 10000LL;
-    // Define gasLimit, max gas provived for transaction
-    uint32_t  gasLimitVal = 3000000;
-    // Define Amount sent in transaction
-    uint256_t valueStr = 0;
-    // Define address of contract to send transaction to
-    string *toStr = (string *)CONTRACT_ADDRESS;
-    // Define Data, hash of an invoked method signature and its encoded parameters
-    string dataStr = energyContract.SetupContractData("verifySignature(bytes32, uint8, bytes32, bytes32)", hashedESPID, v, r, s);
-
-    // Send Transaction to BC (JSON-RPC API to eth_sendRawTransaction)
-    string result = energyContract.SendTransaction(nonceVal, gasPriceVal, gasLimitVal, &caddress, &valueStr, &dataStr);
-    string formattedResult = web3->getResult(&result);
-    Serial.printf("\nEnergy Notarization - Authenticate - Result: %s\n", formattedResult.c_str());
-
-}
-
 // Questa funzione provoca il crash dell'ESP32 (Guru Meditation Error/ abort())
 // Per maggiori informazioni sul contratto è possibile aprire il file EnergyNotarization.sol
-void sendInstantPower(Contract energyContract, int instantPower) {
-    string waddress = (string) MY_ADDRESS;
-    string caddress = (string) CONTRACT_ADDRESS;
-
-    // Define Nonce, int value associated to transaction
-    uint32_t nonceVal = (uint32_t)web3->EthGetTransactionCount(&waddress);
-    // Define gasPrice, int of gas used for transaction
-    unsigned long long gasPriceVal = 10000LL;
-    // Define gasLimit, max gas provived for transaction
-    uint32_t  gasLimitVal = 3000000;
-    // Define Amount sent in transaction
-    uint256_t valueStr = 0;
-    // Define address of contract to send transaction to
-    string *toStr = (string *)CONTRACT_ADDRESS;
-    // Define Data, hash of an invoked method signature and its encoded parameters
-    string func = "addPowerEntry(uint256, bytes32, bytes32, bytes32, uint8)";
-    uint8_t r[32], s[32];
-    uint8_t v;
-    memcpy(r, signatureESPID, 32);
-    memcpy(s, &signatureESPID[32], 32);
-    v = signatureESPID[64];
-
-    string strR = "0x" + uint8ArrayToHexString(r, 32);
-    string strS = "0x" + uint8ArrayToHexString(s, 32);
-    string strHash = "0x" + uint8ArrayToHexString(hashedESPID, 32);
-    Serial.printf("hash: %s\n", strHash.c_str());
-    Serial.printf("r: %s\n", strR.c_str());
-    Serial.printf("s: %s\n", strS.c_str());
-
-    Serial.println("Until setup");
-    // Il crash avviente in questa esecuzione di funzione presente nel file Contract.cpp
-    // di Web3E alla posizione .pio/libdeps/esp32dev/Web3E/src/Contract.cpp
-    // Presenta differentemente alla funzione in echoBytes, l'invio anche di due valori interi
-    string dataStr = energyContract.SetupContractData(
-        "addPowerEntry(uint256, bytes, bytes, bytes, uint)",
-        (uint256_t)instantPower, 
-        strHash,
-        strR,
-        strS,
-        (uint)v);
-    Serial.println("Until send");
-
-    // Send Transaction to BC (JSON-RPC API to eth_sendRawTransaction)
-    string result = energyContract.SendTransaction(nonceVal, gasPriceVal, gasLimitVal, &caddress, &valueStr, &dataStr);
-    string formattedResult = web3->getResult(&result);
-    Serial.printf("\nEnergy Notarization - Send POW Value: %d - Result: %s\n", instantPower, formattedResult.c_str());
-}
-
-// Questa funzione non provoca crash all'ESP32 ma la sua transazione fallisce
-// Per maggiori informazioni sul contratto è possibile aprire il file EnergyNotarization.sol
-void echoBytes(Contract energyContract) {
+void sendInstantPower(Contract energyContract, unsigned int instantPower) {
     string waddress = (string) MY_ADDRESS;
     string caddress = (string) CONTRACT_ADDRESS;
 
@@ -266,26 +207,33 @@ void echoBytes(Contract energyContract) {
     string *toStr = (string *)CONTRACT_ADDRESS;
     // Define Data, hash of an invoked method signature and its encoded parameters
     uint8_t r[32], s[32];
-    uint8_t v;
+    unsigned int v;
     memcpy(r, signatureESPID, 32);
     memcpy(s, &signatureESPID[32], 32);
     v = signatureESPID[64];
     string strHash = "0x" + uint8ArrayToHexString(hashedESPID, 32);
     string strR = "0x" + uint8ArrayToHexString(r, 32);
     string strS = "0x" + uint8ArrayToHexString(s, 32);
-    Serial.printf("hash: %s\n", strHash.c_str());
+    // Serial.printf("hash: %s\n", strHash.c_str());
+    // Serial.printf("r: %s\n", strR.c_str());
+    // Serial.printf("s: %s\n", strS.c_str());
+    // Serial.printf("v: %d\n", v);
 
-    Serial.println("Until setup");
     string dataStr = energyContract.SetupContractData(
-        "echoBytes(bytes,bytes,bytes)",
+        "addPowerEntry(uint256,uint256,bytes32,bytes32,bytes32)",
+        (uint256_t)instantPower,
+        (uint256_t)v,
         strHash,
         strR,
-        strS);
-    Serial.println("Until send");
+        strS
+        );
+
     // Send Transaction to BC (JSON-RPC API to eth_sendRawTransaction)
     string result = energyContract.SendTransaction(nonceVal, gasPriceVal, gasLimitVal, &caddress, &valueStr, &dataStr);
-    string formattedResult = web3->getResult(&result);
-    Serial.printf("\nEnergy Notarization - Echo Bytes Value - Result: %s\n", formattedResult.c_str());
+    endTime = micros();
+    Serial.printf("%d, ", endTime - startTime);
+    // string formattedResult = web3->getResult(&result);
+    // Serial.printf("\nEnergy Notarization - Send POW Value: %d - Result: %s\n", instantPower, formattedResult.c_str());
 }
 
 void setup() {
@@ -295,15 +243,12 @@ void setup() {
     // Connect to Network
     setupWifi();
     Serial.println("\n--- Connection Phase Completed ---\n");
-    
-    // Define Socket of BC Service
-    // The ip address should be that of the server running SSL
-    const char * ip_add = "192.168.126.243";
-    unsigned short port = 443;
-    long long networkId = 1337;
 
+    totalStartTime = micros();
     // Setup WEB3 Connection to BC
-    web3 = new Web3(networkId, ip_add, port);
+    
+    // Set Private Key
+    energyContract.SetPrivateKey(PRIVATE_KEY);
 
     // Operazioni di generazione di hash e firma
     crypto = new Crypto(web3);
@@ -315,20 +260,25 @@ void setup() {
 }
 
 void loop() {
-    unsigned long currentMillis = millis();
+    currentMillis = millis();
 
-    if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis;
+    if(txCounter == txLimit) {
+        totalEndTime = micros();
+        Serial.println("\n---------------------- FINISHED ----------------------\n");
+        Serial.printf("\nTotal Time Elapsed: %d", totalEndTime - totalStartTime);
+        Serial.println();
+        txCounter++;
+    } else if (txCounter < txLimit){
+        if (currentMillis - previousMillis >= interval) {
+            previousMillis = currentMillis;
 
-        // Connect to Running SC
-        Contract energyContract = Contract(web3, CONTRACT_ADDRESS);
-        // Set Private Key
-        energyContract.SetPrivateKey(PRIVATE_KEY);
-
-        int randomInstantPower = random(2, 7);
-        echoBytes(energyContract);
-        // La funzione sottostante genera un segentation fault
-        // sendInstantPower(energyContract, randomInstantPower);
-        getMaxPower(energyContract);
+            randomNumber = random(2, 6);
+            startTime = micros();
+            sendInstantPower(energyContract, randomNumber);
+            // Serial.printf("\nTX COUNT: %d\n", txCounter);
+            // echoBytes(energyContract);
+            txCounter++;
+            // getMaxPower(energyContract);
+        }
     }
 }

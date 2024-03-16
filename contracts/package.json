@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "fs-extra": "^11.2.0",
-    "keys.js": "^1.0.2",
-    "web3": "^1.10.3",
-    "web3js-quorum": "^22.4.0"
-  }
-}
