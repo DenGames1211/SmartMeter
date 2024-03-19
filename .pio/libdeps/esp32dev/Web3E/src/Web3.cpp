@@ -246,9 +246,9 @@ string Web3::exec(const string* data) {
         char c = client->read();
         result += c;
     }
+    
     client->flush();
     client->stop();
-
     client->~WiFiClientSecure();
     
     return result;
