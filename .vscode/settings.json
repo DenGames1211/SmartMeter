@@ -50,7 +50,15 @@
         "streambuf": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "*.include": "cpp"
+        "*.include": "cpp",
+        "*.inc": "cpp",
+        "genericutils.h": "c",
+        "arduino.h": "c",
+        "web3.h": "c",
+        "esp32blockchainutils.h": "c",
+        "esp32utils.h": "c"
     },
-    "cmake.sourceDirectory": "C:/Users/Daniele/Documents/PlatformIO/Projects/SmartMeter/.pio/libdeps/esp32dev/Unity"
+    "cmake.sourceDirectory": "C:/Users/Daniele/Documents/PlatformIO/Projects/SmartMeter/.pio/libdeps/esp32dev/Unity",
+    "C_Cpp.errorSquiggles": "enabledIfIncludesResolve",
+    "C_Cpp.default.compilerPath": "/home/den/.platformio/packages/toolchain-xtensa-esp32/bin/xtensa-esp32-elf-gcc"
 }
