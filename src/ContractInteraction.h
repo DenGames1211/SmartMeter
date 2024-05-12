@@ -5,7 +5,6 @@
 
 #include <CryptoUtils.h>
 
-void getMaxPower(Web3 *web3, const char *myAddress, Contract energyContract);
-void sendInstantPower(Web3 *web3, Crypto *crypto, const char *myAddress, const char *contractAddress, Contract energyContract, unsigned char *encryptedPower);
+void sendInstantEnergy(Web3 *web3, Crypto *crypto, const char *myAddress, const char *contractAddress, Contract energyContract, unsigned char *encryptedEnergy);
 
 #endif //CONTRACT_INT

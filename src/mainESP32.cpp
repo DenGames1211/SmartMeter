@@ -99,7 +99,7 @@ void loop() {
             uint8_t randomNumber = random(2, 6) + '0';
             encryptData(companyPK, sizeof(companyPK), &randomNumber, &ctr_drbg);
 
-            sendInstantPower(web3, crypto, MY_ADDRESS, CONTRACT_ADDRESS, energyContract, (unsigned char *)encryptData(companyPK, sizeof(companyPK), &randomNumber, &ctr_drbg).c_str());
+            sendInstantEnergy(web3, crypto, MY_ADDRESS, CONTRACT_ADDRESS, energyContract, (unsigned char *)encryptData(companyPK, sizeof(companyPK), &randomNumber, &ctr_drbg).c_str());
             txCounter++;
         }
     }

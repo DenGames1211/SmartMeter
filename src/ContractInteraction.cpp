@@ -14,8 +14,8 @@ void getMaxPower(Web3 *web3, const char *myAddress, Contract energyContract) {
 }
 */
 
-// Change instantPower with encrypted Data
-void sendInstantPower(Web3 *web3, Crypto *crypto, const char *myAddress, const char *contractAddress, Contract energyContract, unsigned char *encryptedPower) {
+// Change instantEnergy with encrypted Data
+void sendInstantEnergy(Web3 *web3, Crypto *crypto, const char *myAddress, const char *contractAddress, Contract energyContract, unsigned char *encryptedEnergy) {
     unsigned long startTime = micros(), endTime;
     string waddress = (string) myAddress;
     string caddress = (string) contractAddress;
@@ -34,7 +34,7 @@ void sendInstantPower(Web3 *web3, Crypto *crypto, const char *myAddress, const c
 
     // Define Data, hash of an invoked method signature and its encoded parameters
     // Hash and Sign encrypted power data 
-    crypto->Keccak256(encryptedPower, 32, hashedEncryptedData);
+    crypto->Keccak256(encryptedEnergy, 32, hashedEncryptedData);
     crypto->Sign(hashedEncryptedData, signatureEncryptedData);
 
     uint8_t r[32], s[32];
@@ -47,9 +47,9 @@ void sendInstantPower(Web3 *web3, Crypto *crypto, const char *myAddress, const c
     string strS = "0x" + getHexStringFromUint8(s, 32);
     
     string dataStr = energyContract.SetupContractData(
-        "addPowerEntry(uint256,bytes,bytes32,bytes32,bytes32)",
+        "addEnergyEntry(uint256,bytes,bytes32,bytes32,bytes32)",
         (uint256_t)v,
-        encryptedPower,
+        encryptedEnergy,
         strHash,
         strR,
         strS

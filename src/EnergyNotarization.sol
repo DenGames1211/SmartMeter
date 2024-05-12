@@ -22,10 +22,10 @@ contract EnergyNotarization {
         return recoverSigner(id_hashed, r, s, v) == msg.sender;
     }
 
-    function addPowerEntry(bytes memory _latestPower, bytes32 power_hashed, bytes32 r, bytes32 s, uint8 v) public {
-        require(verifySignature(power_hashed, r, s, v), "Firma Digitale Non Valida");
+    function addEnergyEntry(bytes memory _latestEnergy, bytes32 energy_hashed, bytes32 r, bytes32 s, uint8 v) public {
+        require(verifySignature(energy_hashed, r, s, v), "Firma Digitale Non Valida");
 
-        emit addedMeasure(msg.sender, _latestPower);
+        emit addedMeasure(msg.sender, _latestEnergy);
     }
 
 }
