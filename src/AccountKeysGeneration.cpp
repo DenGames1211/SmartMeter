@@ -49,5 +49,7 @@ String genWritePrivateKeyROM() {
     EEPROM.writeString(EEPROM_PK_ADDR, privateKeyString);
     EEPROM.commit();
 
+    Serial.printf("From GEN: %s\n", privateKeyString.c_str());
+
     return privateKeyString;
 }
