@@ -30,7 +30,7 @@ const char *MY_ADDRESS = "0x627306090abaB3A6e1400e9345bC60c78a8BEf57";
 
 Web3 *web3;
 Crypto *crypto;    
-Contract energyContract = Contract(web3, CONTRACT_ADDRESS);
+Contract *energyContract;
 
 
 void setup() {
@@ -71,7 +71,8 @@ void setup() {
     crypto->SetPrivateKey(besuKey.c_str());
     
     // Set Private Key
-    energyContract.SetPrivateKey(besuKey.c_str());
+    energyContract = new Contract(web3, CONTRACT_ADDRESS);
+    energyContract->SetPrivateKey(besuKey.c_str());
 
     // Init Entropy Context and CRT (Randomization) Function
     mbedtls_entropy_init(&entropy);
@@ -103,7 +104,7 @@ void loop() {
 
             uint8_t randomNumber = random(2, 6) + '0';
 
-            sendInstantEnergy(web3, crypto, MY_ADDRESS, CONTRACT_ADDRESS, energyContract, (unsigned char *)encryptData(companyPK, sizeof(companyPK), &randomNumber, &ctr_drbg).c_str());
+            sendInstantEnergy(web3, crypto, MY_ADDRESS, CONTRACT_ADDRESS, *energyContract, (unsigned char *)encryptData(companyPK, sizeof(companyPK), &randomNumber, &ctr_drbg).c_str());
             txCounter++;
         }
     }

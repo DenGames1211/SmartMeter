@@ -45,11 +45,12 @@ void sendInstantEnergy(Web3 *web3, Crypto *crypto, const char *myAddress, const 
     string strHash = "0x" + getHexStringFromUint8(hashedEncryptedData, 32);
     string strR = "0x" + getHexStringFromUint8(r, 32);
     string strS = "0x" + getHexStringFromUint8(s, 32);
-    
+    std::string strEncEnergy(reinterpret_cast<char*>(encryptedEnergy));
+
     string dataStr = energyContract.SetupContractData(
         "addEnergyEntry(uint256,bytes,bytes32,bytes32,bytes32)",
         (uint256_t)v,
-        encryptedEnergy,
+        strEncEnergy,
         strHash,
         strR,
         strS
