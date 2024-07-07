@@ -17,7 +17,7 @@ void generatePrivateKey(uint8_t* privateKey, size_t length) {
 
 void derivePublicKey(const uint8_t privateKey[32], uint8_t publicKey[16]) {
     // Use the private key to compute the public key
-    uECC_compute_public_key(privateKey, publicKey, uECC_secp192r1());
+    uECC_compute_public_key(privateKey, publicKey, uECC_secp256r1()); // sub with 192 r1 if not working
 }
 
 String genWritePrivateKeyROM() {
