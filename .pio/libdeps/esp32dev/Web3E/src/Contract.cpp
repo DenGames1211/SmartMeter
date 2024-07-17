@@ -82,7 +82,7 @@ string Contract::SetupContractData(const char* func, ...)
             isDynamic.push_back(false);
             dynamicStartPointer += 0x20;
         }
-        else if (strncmp(params[i].c_str(), "uint", sizeof("uint")) == 0 || strncmp(params[i].c_str(), "uint256", sizeof("uint256")) == 0)
+        else if (strncmp(params[i].c_str(), "uint", sizeof("uint")) == 0 || strncmp(params[i].c_str(), "uint256", sizeof("uint256")) == 0 || strncmp(params[i].c_str(), "uint8", sizeof("uint8")) == 0)
         {
             string output = GenerateBytesForUint(va_arg(args, uint256_t *));
             // Serial.printf("%s\n", output.c_str());

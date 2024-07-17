@@ -19,13 +19,23 @@ void printHexFromUInt8(uint8_t uintArray[], int len) {
     Serial.println();
 }
 
+void printArray(unsigned long *array, unsigned long int len) {
+    Serial.printf("[");
+    for (int i = 0; i < len; i++) {
+        Serial.printf("%d, ", array[i]);
+    }
+    Serial.printf("]");
+    Serial.println();
+}
+
 void getOperationTime(string timeLabel, unsigned long *startTime, unsigned long *endTime) {
     *endTime = micros();
     Serial.printf("Time needed to Encode Data String: %d\n", *endTime - *startTime);
     *startTime = micros();
 }
 
-string encryptData(unsigned char *publicKey, const unsigned int publicKeyLen, const unsigned char *toEncrypt, mbedtls_ctr_drbg_context *ctr_drbg) {
+string encryptData(unsigned long int i, unsigned long *cypherTime, unsigned char *publicKey, const unsigned int publicKeyLen, const unsigned char *toEncrypt, mbedtls_ctr_drbg_context *ctr_drbg) {
+    unsigned long startTime = micros();
     mbedtls_pk_context pk;
     mbedtls_pk_init(&pk);
 
@@ -52,6 +62,7 @@ string encryptData(unsigned char *publicKey, const unsigned int publicKeyLen, co
         Serial.printf("Data Encryption Failed\n mbedtls_pk_encrypt returned -0x%04x\n", -retCode );
         exit;
     } else {
+        cypherTime[i] = micros() - startTime;
         dataToSend = "0x" + getHexStringFromUint8(encrypted, encryptedLen);
         Serial.printf("\nEncrypted Data: %s\n", dataToSend.c_str());
     }

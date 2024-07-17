@@ -32,7 +32,7 @@ String genWritePrivateKeyROM() {
     derivePublicKey(privateKey, publicKey);
 
     // Print private key (in hexadecimal format)
-    // printHexFromUInt8(privateKey, 32);
+    printHexFromUInt8(privateKey, 32);
 
     // Print public key (in uncompressed format)
     Serial.print("\nESP32 Blockchain Connection Public Key: ");

@@ -13,7 +13,8 @@
 
 string getHexStringFromUint8(uint8_t uintArray[], int len);
 void printHexFromUInt8(uint8_t uintArray[], int len);
+void printArray(unsigned long *array, unsigned long int len);
 void getOperationTime(string timeLabel, unsigned long *startTime, unsigned long *endTime);
-string encryptData(unsigned char *publicKey, const unsigned int publicKeyLen, const unsigned char *toEncrypt, mbedtls_ctr_drbg_context *ctr_drbg);
+string encryptData(unsigned long int i, unsigned long *cypherTime, unsigned char *publicKey, const unsigned int publicKeyLen, const unsigned char *toEncrypt, mbedtls_ctr_drbg_context *ctr_drbg);
 
 #endif //ESP_UTILS
